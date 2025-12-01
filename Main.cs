@@ -92,22 +92,17 @@ public class Main : Plugin
 
     private void UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix_OnInvoke(ref string Message)
     {
-        Logger.LogInfo($"Message (Before): {Message}");
+        Logger.LogDebug($"Message (Before): {Message}");
 
         StringBuilder StringBuilder = new();
 
-        Logger.LogInfo($"ChatFont:{ChatBehaviour._current._chatAssets._chatText.font.faceInfo.familyName}");
-        Logger.LogInfo($"ChatFontFallbacks:{string.Join(", ", ChatBehaviour._current._chatAssets._chatText.font.fallbackFontAssetTable.Select(x => x.faceInfo.familyName))}");
+        Logger.LogDebug($"ChatFont:{ChatBehaviour._current._chatAssets._chatText.font.faceInfo.familyName}");
+        Logger.LogDebug($"ChatFontFallbacks:{string.Join(", ", ChatBehaviour._current._chatAssets._chatText.font.fallbackFontAssetTable.Select(x => x.faceInfo.familyName))}");
 
         foreach (char Character in Message)
         {
             if (ChatBehaviour._current._chatAssets._chatText.font.HasCharacter(Character, true))
             {
-                //string[] prikoli1 = ["", "<b>", "<i>"];
-                //string[] prikoli2 = ["", "</b>", "</i>"];
-                //int prikol = Random.Range(0, prikoli1.Length);
-
-                //StringBuilder.Append($"{prikoli1[prikol]}{Character}{prikoli2[prikol]}");
                 StringBuilder.Append(Character);
                 continue;
             }
@@ -116,7 +111,7 @@ public class Main : Plugin
         }
 
         Message = StringBuilder.ToString();
-        Logger.LogInfo($"Message (After): {Message}");
+        Logger.LogDebug($"Message (After): {Message}");
     }
 
     protected override void Unload()
