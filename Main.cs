@@ -31,6 +31,7 @@ public class Main : Plugin
 
     protected override void Load()
     {
+        // WIP
         Configuration.Instance.Load(Config);
 
         if (Configuration.Instance.Debug.Log_TextMeshProUGUI_OnEnable.Value)
@@ -53,7 +54,8 @@ public class Main : Plugin
             Patches.TMPro.TextMeshPro.OnEnable_Prefix.OnInvoke += TextMeshPro_OnEnable_Prefix_OnInvoke;
         }
 
-        Patches.ChatBehaviour.UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix.OnInvoke += UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix_OnInvoke;
+        if (Configuration.Instance.General.ReplaceUnknownCharactersWithCodes.Value)
+            Patches.ChatBehaviour.UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix.OnInvoke += UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix_OnInvoke;
     }
 
     private void TMPro_TextMeshProUGUI_OnEnable_Prefix_Log(TextMeshProUGUI Instance)
@@ -125,7 +127,8 @@ public class Main : Plugin
             Patches.TMPro.TextMeshPro.OnEnable_Prefix.OnInvoke -= TextMeshPro_OnEnable_Prefix_OnInvoke;
         }
 
-        Patches.ChatBehaviour.UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix.OnInvoke -= UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix_OnInvoke;
+        if (Configuration.Instance.General.ReplaceUnknownCharactersWithCodes.Value)
+            Patches.ChatBehaviour.UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix.OnInvoke -= UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix_OnInvoke;
 
         Harmony.UnpatchSelf();
     }

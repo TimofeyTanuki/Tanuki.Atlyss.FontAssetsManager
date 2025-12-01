@@ -99,6 +99,7 @@
     <Compile Include="Managers\AssetBundles.cs" />
     <Compile Include="Models\Configuration\Debug.cs" />
     <Compile Include="Models\Configuration\Fallback.cs" />
+    <Compile Include="Models\Configuration\General.cs" />
     <Compile Include="Models\Configuration\Replacement.cs" />
     <Compile Include="Models\Configuration\Asset.cs" />
     <Compile Include="Models\Configuration\Rule.cs" />
