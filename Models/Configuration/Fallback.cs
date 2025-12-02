@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Tanuki.Atlyss.FontAssetsManager.Models.Configuration;
 
 [Serializable]
-internal struct Fallback
+internal class Fallback
 {
     [JsonProperty("Rule")]
     public Rule Rule;
@@ -13,6 +13,6 @@ internal struct Fallback
     [JsonProperty("Fixed")]
     public bool Fixed;
 
-    [JsonProperty("Assets")]
-    public List<Asset> Fallbacks;
+    [JsonProperty("Fallbacks")]
+    public List<Asset> Fallbacks = [];
 }

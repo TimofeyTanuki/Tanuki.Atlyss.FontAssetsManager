@@ -11,7 +11,7 @@ namespace Tanuki.Atlyss.FontAssetsManager.Managers;
 
 public class Replacement
 {
-    private const string DirectoryName = "Assets";
+    private const string DirectoryName = "Replacements";
     public static Replacement Instance;
 
     private string ReplacementConfigurationsPath;

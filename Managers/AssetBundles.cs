@@ -57,6 +57,8 @@ public class AssetBundles
             foreach (TMP_FontAsset TMP_FontAsset in AssetBundle.LoadAllAssets<TMP_FontAsset>())
             {
                 Hash = GetAssetHash(AssetBundle.name, TMP_FontAsset.name);
+                Main.Instance.ManualLogSource.LogDebug($"Found Font (TMP): \"{TMP_FontAsset.name}\" hash: {Hash}");
+
                 if (AssetsTMP.ContainsKey(Hash))
                 {
                     Main.Instance.ManualLogSource.LogWarning($"Duplicate AssetsTMP: {TMP_FontAsset.name}");
@@ -64,12 +66,14 @@ public class AssetBundles
                 }
 
                 AssetsTMP.Add(Hash, TMP_FontAsset);
-                Main.Instance.ManualLogSource.LogInfo($"Added Font (TMP): asset \"{TMP_FontAsset.name}\" with font \"{TMP_FontAsset.faceInfo.familyName}\" hash: {Hash}");
+                Main.Instance.ManualLogSource.LogDebug($"Added Font (TMP): asset \"{TMP_FontAsset.name}\" with font \"{TMP_FontAsset.faceInfo.familyName}\" hash: {Hash}");
             }
 
             foreach (Font Font in AssetBundle.LoadAllAssets<Font>())
             {
                 Hash = GetAssetHash(AssetBundle.name, Font.name);
+                Main.Instance.ManualLogSource.LogDebug($"Found Font: \"{Font.name}\" hash: {Hash}");
+
                 if (Assets.ContainsKey(Hash))
                 {
                     Main.Instance.ManualLogSource.LogWarning($"Duplicate Assets: {Font.name}");
@@ -77,7 +81,7 @@ public class AssetBundles
                 }
 
                 Assets.Add(Hash, Font);
-                Main.Instance.ManualLogSource.LogInfo($"Added Font: \"{Font.name}\" hash: {Hash}");
+                Main.Instance.ManualLogSource.LogDebug($"Added Font: \"{Font.name}\" hash: {Hash}");
             }
         }
     }

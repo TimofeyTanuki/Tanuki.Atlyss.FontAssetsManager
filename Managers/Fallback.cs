@@ -10,7 +10,7 @@ namespace Tanuki.Atlyss.FontAssetsManager.Managers;
 
 public class Fallback
 {
-    private const string DirectoryName = "Assets";
+    private const string DirectoryName = "Fallbacks";
     public static Fallback Instance;
 
     private string ReplacementConfigurationsPath;
@@ -40,7 +40,7 @@ public class Fallback
         Rule Rule;
         TMP_FontAsset TMP_FontAsset;
         Models.Fallback CurrentFallback;
-        HashSet<TMP_FontAsset> Assets = [];
+        HashSet<TMP_FontAsset> Fallbacks = [];
         foreach (string File in Directory.GetFiles(ReplacementConfigurationsPath, "*.json"))
         {
             Configuration = JsonConvert.DeserializeObject<List<Models.Configuration.Fallback>>(System.IO.File.ReadAllText(File));
@@ -57,20 +57,7 @@ public class Fallback
                     continue;
                 }
 
-                CurrentFallback = null;
-                foreach (Models.Fallback OtherFallback in this.Assets)
-                {
-                    if (!OtherFallback.Rule.Equals(Fallback.Rule))
-                        continue;
-
-                    if (Fallback.Fixed)
-                        OtherFallback.Assets.Clear();
-
-                    CurrentFallback = OtherFallback;
-                    break;
-                }
-
-                Assets.Clear();
+                Fallbacks.Clear();
                 foreach (Models.Configuration.Asset Asset in Fallback.Fallbacks)
                 {
                     TMP_FontAsset = AssetBundles.Instance.GetFontAssetTMP(Asset.AssetBundle, Asset.Name);
@@ -80,28 +67,41 @@ public class Fallback
                         continue;
                     }
 
-                    Assets.Add(TMP_FontAsset);
+                    Fallbacks.Add(TMP_FontAsset);
                 }
 
-                if (Assets.Count == 0)
+                if (Fallbacks.Count == 0)
                     continue;
 
-                if (CurrentFallback is not null)
+                CurrentFallback = null;
+                foreach (Models.Fallback OtherFallback in Assets)
                 {
-                    if (Fallback.Fixed)
-                        CurrentFallback.Assets.Clear();
+                    if (!OtherFallback.Rule.Equals(Fallback.Rule))
+                        continue;
+
+                    CurrentFallback = OtherFallback;
+                    break;
+                }
+
+                if (CurrentFallback is null)
+                {
+                    CurrentFallback = new(Rule, Fallback.Fixed);
+                    Assets.Add(CurrentFallback);
                 }
                 else
                 {
-                    CurrentFallback = new(Rule, Fallback.Fixed);
-                    this.Assets.Add(CurrentFallback);
-                }
+                    CurrentFallback.Fixed = Fallback.Fixed;
 
-                foreach (TMP_FontAsset Asset in Assets)
+                    if (CurrentFallback.Fixed)
+                        CurrentFallback.Assets.Clear();
+                }
+                Main.Instance.ManualLogSource.LogDebug("D6");
+                foreach (TMP_FontAsset Asset in Fallbacks)
                     CurrentFallback.Assets.Add(Asset);
             }
         }
 
+        Main.Instance.ManualLogSource.LogDebug($"Fallback rules (x{this.Assets.Count})");
     }
     public void Handle(TMP_Text TMP_Text)
     {
@@ -122,8 +122,6 @@ public class Fallback
 
                 TMP_Text.font.fallbackFontAssetTable.Add(TMP_FontAsset);
             }
-
-            Main.Instance.ManualLogSource.LogDebug($"FLB Obj:{TMP_Text.name}|Font:{TMP_Text.font.name}");
 
             break;
         }
