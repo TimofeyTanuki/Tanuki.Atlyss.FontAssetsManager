@@ -13,6 +13,6 @@ internal struct Fallback
     [JsonProperty("Fixed")]
     public bool Fixed;
 
-    [JsonProperty("Fallbacks")]
+    [JsonProperty("Assets")]
     public List<Asset> Fallbacks;
 }

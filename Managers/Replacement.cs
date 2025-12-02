@@ -9,16 +9,20 @@ using UnityEngine;
 
 namespace Tanuki.Atlyss.FontAssetsManager.Managers;
 
-internal class Replacement
+public class Replacement
 {
-    private const string DirectoryName = "Replacements";
+    private const string DirectoryName = "Assets";
     public static Replacement Instance;
 
     private string ReplacementConfigurationsPath;
-    public List<Replacement<TMP_FontAsset>> ReplacementsTMP;
-    public List<Replacement<Font>> Replacements;
+    public readonly List<Replacement<TMP_FontAsset>> AssetsTMP;
+    public readonly List<Replacement<Font>> Assets;
 
-    private Replacement() { }
+    private Replacement()
+    {
+        Assets = [];
+        AssetsTMP = [];
+    }
 
     public static void Initialize()
     {
@@ -27,8 +31,6 @@ internal class Replacement
 
         Instance = new()
         {
-            ReplacementsTMP = [],
-            Replacements = [],
             ReplacementConfigurationsPath = Path.Combine(Paths.ConfigPath, Main.Instance.Name, DirectoryName)
         };
     }
@@ -73,7 +75,7 @@ internal class Replacement
                     {
                         AddReplacement = true;
 
-                        foreach (Replacement<TMP_FontAsset> OtherReplacement in ReplacementsTMP)
+                        foreach (Replacement<TMP_FontAsset> OtherReplacement in AssetsTMP)
                         {
                             if (OtherReplacement.Rule.Equals(Rule))
                                 continue;
@@ -84,14 +86,14 @@ internal class Replacement
                         }
 
                         if (AddReplacement)
-                            ReplacementsTMP.Add(new(Rule, TMP_FontAsset));
+                            AssetsTMP.Add(new(Rule, TMP_FontAsset));
                     }
 
                     if (Font is not null)
                     {
                         AddReplacement = true;
 
-                        foreach (Replacement<Font> OtherReplacement in Replacements)
+                        foreach (Replacement<Font> OtherReplacement in Assets)
                         {
                             if (!OtherReplacement.Equals(Rule))
                                 continue;
@@ -102,18 +104,18 @@ internal class Replacement
                         }
 
                         if (AddReplacement)
-                            Replacements.Add(new(Rule, Font));
+                            Assets.Add(new(Rule, Font));
                     }
                 }
             }
         }
 
-        Main.Instance.ManualLogSource.LogDebug($"Rule rules (Fonts) (x{Replacements.Count})");
-        Main.Instance.ManualLogSource.LogDebug($"Rule rules (Fonts_TMP) (x{ReplacementsTMP.Count})");
+        Main.Instance.ManualLogSource.LogDebug($"Rule rules (Fonts) (x{Assets.Count})");
+        Main.Instance.ManualLogSource.LogDebug($"Rule rules (Fonts_TMP) (x{AssetsTMP.Count})");
     }
     public void Handle(TMP_Text TMP_Text)
     {
-        foreach (Replacement<TMP_FontAsset> Replacement in ReplacementsTMP)
+        foreach (Replacement<TMP_FontAsset> Replacement in AssetsTMP)
         {
             if (TMP_Text.font == Replacement.Asset)
                 break;
@@ -129,7 +131,7 @@ internal class Replacement
     }
     public void Replace(UnityEngine.UI.Text Text)
     {
-        foreach (Replacement<Font> Replacement in Replacements)
+        foreach (Replacement<Font> Replacement in Assets)
         {
             if (Text.font == Replacement.Asset)
                 break;
@@ -142,5 +144,10 @@ internal class Replacement
 
             break;
         }
+    }
+    public void Unload()
+    {
+        Assets.Clear();
+        AssetsTMP.Clear();
     }
 }

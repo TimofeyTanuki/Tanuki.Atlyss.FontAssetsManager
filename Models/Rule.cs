@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace Tanuki.Atlyss.FontAssetsManager.Models;
 
-internal class Rule(Regex ObjectName, Regex FontName) : IEquatable<Rule>
+public class Rule(Regex ObjectName, Regex FontName) : IEquatable<Rule>
 {
     private readonly Regex
         ObjectName = ObjectName,

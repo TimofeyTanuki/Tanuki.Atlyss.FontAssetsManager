@@ -104,7 +104,6 @@
     <Compile Include="Models\Configuration\Asset.cs" />
     <Compile Include="Models\Configuration\Rule.cs" />
     <Compile Include="Models\Fallback.cs" />
-    <Compile Include="Models\FontAsset.cs" />
     <Compile Include="Models\Replacement.cs" />
     <Compile Include="Models\Rule.cs" />
     <Compile Include="Patches\ChatBehaviour\UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix.cs" />

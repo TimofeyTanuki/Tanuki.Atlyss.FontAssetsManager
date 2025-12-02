@@ -8,15 +8,16 @@ using TMPro;
 
 namespace Tanuki.Atlyss.FontAssetsManager.Managers;
 
-internal class Fallback
+public class Fallback
 {
-    private const string DirectoryName = "Fallbacks";
+    private const string DirectoryName = "Assets";
     public static Fallback Instance;
 
     private string ReplacementConfigurationsPath;
-    public List<Models.Fallback> Fallbacks;
+    public readonly List<Models.Fallback> Assets;
 
-    private Fallback() { }
+    private Fallback() =>
+        Assets = [];
 
     public static void Initialize()
     {
@@ -25,7 +26,6 @@ internal class Fallback
 
         Instance = new()
         {
-            Fallbacks = [],
             ReplacementConfigurationsPath = Path.Combine(Paths.ConfigPath, Main.Instance.Name, DirectoryName)
         };
     }
@@ -58,7 +58,7 @@ internal class Fallback
                 }
 
                 CurrentFallback = null;
-                foreach (Models.Fallback OtherFallback in Fallbacks)
+                foreach (Models.Fallback OtherFallback in this.Assets)
                 {
                     if (!OtherFallback.Rule.Equals(Fallback.Rule))
                         continue;
@@ -94,7 +94,7 @@ internal class Fallback
                 else
                 {
                     CurrentFallback = new(Rule, Fallback.Fixed);
-                    Fallbacks.Add(CurrentFallback);
+                    this.Assets.Add(CurrentFallback);
                 }
 
                 foreach (TMP_FontAsset Asset in Assets)
@@ -105,7 +105,7 @@ internal class Fallback
     }
     public void Handle(TMP_Text TMP_Text)
     {
-        foreach (Models.Fallback Fallback in Fallbacks)
+        foreach (Models.Fallback Fallback in Assets)
         {
             if (!Fallback.Rule.IsMatch(TMP_Text.name, TMP_Text.font.name))
                 continue;
@@ -128,4 +128,6 @@ internal class Fallback
             break;
         }
     }
+
+    public void Unload() => Assets.Clear();
 }

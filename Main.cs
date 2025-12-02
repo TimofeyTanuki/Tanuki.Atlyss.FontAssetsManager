@@ -2,18 +2,22 @@
 using BepInEx.Logging;
 using HarmonyLib;
 using System;
-using System.Linq;
 using System.Text;
 using Tanuki.Atlyss.Core.Plugins;
 using Tanuki.Atlyss.FontAssetsManager.Managers;
 using TMPro;
+using UnityEngine.UI;
 
 namespace Tanuki.Atlyss.FontAssetsManager;
 
 [BepInPlugin(PluginInfo.GUID, "Tanuki.Atlyss.FontAssetsManager", PluginInfo.Version)]
 [BepInDependency("9c00d52e-10b8-413f-9ee4-bfde81762442", BepInDependency.DependencyFlags.HardDependency)]
-public class Main : Plugin
+internal class Main : Plugin
 {
+    private const string
+        Debug_ObjectLabel = "Object: ",
+        Debug_FontLabel = "Font: ";
+
     internal static Main Instance;
     internal ManualLogSource ManualLogSource;
     private readonly Harmony Harmony = new(PluginInfo.GUID);
@@ -31,19 +35,20 @@ public class Main : Plugin
 
     protected override void Load()
     {
-        // WIP
         Configuration.Instance.Load(Config);
-
-        if (Configuration.Instance.Debug.Log_TextMeshProUGUI_OnEnable.Value)
-        {
-            Patches.TMPro.TextMeshProUGUI.OnEnable_Prefix.OnInvoke += TMPro_TextMeshProUGUI_OnEnable_Prefix_Log;
-        }
-
         AssetBundles.Instance.Load();
+
         Replacement.Instance.Load();
         Fallback.Instance.Load();
 
-        Harmony.PatchAll();
+        if (Configuration.Instance.Debug.Log_TMP_Text_OnEnable.Value)
+        {
+            Patches.TMPro.TextMeshProUGUI.OnEnable_Prefix.OnInvoke += TMP_Text_OnEnable_Log;
+            Patches.TMPro.TextMeshPro.OnEnable_Prefix.OnInvoke += TMP_Text_OnEnable_Log;
+        }
+
+        if (Configuration.Instance.Debug.Log_Text_OnEnable.Value)
+            Patches.UnityEngine.UI.Text.OnEnable_Prefix.OnInvoke += Text_OnEnable_Log;
 
         if (AssetBundles.Instance.Assets.Count > 0)
             Patches.UnityEngine.UI.Text.OnEnable_Prefix.OnInvoke += OnEnable_Prefix_OnInvoke;
@@ -56,25 +61,29 @@ public class Main : Plugin
 
         if (Configuration.Instance.General.ReplaceUnknownCharactersWithCodes.Value)
             Patches.ChatBehaviour.UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix.OnInvoke += UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix_OnInvoke;
-    }
 
-    private void TMPro_TextMeshProUGUI_OnEnable_Prefix_Log(TextMeshProUGUI Instance)
+        Harmony.PatchAll();
+    }
+    private void TMP_Text_OnEnable_Log(TMP_Text Instance)
     {
-        StringBuilder StringBuilder = new("TextMeshProUGUI\n");
-        StringBuilder.Append("name: ");
+        StringBuilder StringBuilder = new("TMP_Text\n");
+        StringBuilder.Append(Debug_ObjectLabel);
         StringBuilder.AppendLine(Instance.name);
-        StringBuilder.Append("transform.name: ");
-        StringBuilder.AppendLine(Instance.transform.name);
-        StringBuilder.Append("font.faceInfo.familyName: ");
-        StringBuilder.AppendLine(Instance.font.faceInfo.familyName);
-        StringBuilder.Append("font.faceInfo.styleName: ");
-        StringBuilder.AppendLine(Instance.font.faceInfo.styleName);
-        StringBuilder.Append("Instance.font.name: ");
+        StringBuilder.Append(Debug_FontLabel);
+        StringBuilder.AppendLine(Instance.font.name);
+        Logger.LogDebug(StringBuilder.ToString());
+    }
+    private void Text_OnEnable_Log(Text Instance)
+    {
+        StringBuilder StringBuilder = new("Text\n");
+        StringBuilder.Append(Debug_ObjectLabel);
+        StringBuilder.AppendLine(Instance.name);
+        StringBuilder.Append(Debug_FontLabel);
         StringBuilder.AppendLine(Instance.font.name);
         Logger.LogDebug(StringBuilder.ToString());
     }
 
-    private void OnEnable_Prefix_OnInvoke(UnityEngine.UI.Text Instance)
+    private void OnEnable_Prefix_OnInvoke(Text Instance)
     {
         if (Instance.font is null)
             return;
@@ -91,15 +100,9 @@ public class Main : Plugin
         Replacement.Instance.Handle(Instance);
         Fallback.Instance.Handle(Instance);
     }
-
     private void UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix_OnInvoke(ref string Message)
     {
-        Logger.LogDebug($"Message (Before): {Message}");
-
         StringBuilder StringBuilder = new();
-
-        Logger.LogDebug($"ChatFont:{ChatBehaviour._current._chatAssets._chatText.font.faceInfo.familyName}");
-        Logger.LogDebug($"ChatFontFallbacks:{string.Join(", ", ChatBehaviour._current._chatAssets._chatText.font.fallbackFontAssetTable.Select(x => x.faceInfo.familyName))}");
 
         foreach (char Character in Message)
         {
@@ -113,9 +116,7 @@ public class Main : Plugin
         }
 
         Message = StringBuilder.ToString();
-        Logger.LogDebug($"Message (After): {Message}");
     }
-
     protected override void Unload()
     {
         if (AssetBundles.Instance.Assets.Count > 0)
@@ -129,6 +130,9 @@ public class Main : Plugin
 
         if (Configuration.Instance.General.ReplaceUnknownCharactersWithCodes.Value)
             Patches.ChatBehaviour.UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix.OnInvoke -= UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix_OnInvoke;
+
+        Replacement.Instance.Unload();
+        Fallback.Instance.Unload();
 
         Harmony.UnpatchSelf();
     }

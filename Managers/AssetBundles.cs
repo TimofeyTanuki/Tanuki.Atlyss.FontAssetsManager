@@ -1,22 +1,27 @@
 ﻿using BepInEx;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using TMPro;
 using UnityEngine;
 
 namespace Tanuki.Atlyss.FontAssetsManager.Managers;
 
-internal class AssetBundles
+public class AssetBundles
 {
     private const string AssetBundlesDirectory = "AssetBundles";
     public static AssetBundles Instance;
 
     private string AssetBundlesPath;
-    public Dictionary<ulong, TMP_FontAsset> AssetsTMP;
-    public Dictionary<ulong, Font> Assets;
+    public readonly Dictionary<ulong, TMP_FontAsset> AssetsTMP;
+    public readonly Dictionary<ulong, Font> Assets;
 
-    private AssetBundles() { }
+    private AssetBundles()
+    {
+        AssetsTMP = [];
+        Assets = [];
+    }
 
     public static void Initialize()
     {
@@ -25,9 +30,7 @@ internal class AssetBundles
 
         Instance = new()
         {
-            AssetBundlesPath = Path.Combine(Paths.PluginPath, Main.Instance.Name, AssetBundlesDirectory),
-            AssetsTMP = [],
-            Assets = []
+            AssetBundlesPath = Path.Combine(Paths.PluginPath, Main.Instance.Name, AssetBundlesDirectory)
         };
     }
     public void Load()
@@ -56,7 +59,7 @@ internal class AssetBundles
                 Hash = GetAssetHash(AssetBundle.name, TMP_FontAsset.name);
                 if (AssetsTMP.ContainsKey(Hash))
                 {
-                    Main.Instance.ManualLogSource.LogWarning($"Duplicate ReplacementsTMP: {TMP_FontAsset.name}");
+                    Main.Instance.ManualLogSource.LogWarning($"Duplicate AssetsTMP: {TMP_FontAsset.name}");
                     continue;
                 }
 
@@ -69,7 +72,7 @@ internal class AssetBundles
                 Hash = GetAssetHash(AssetBundle.name, Font.name);
                 if (Assets.ContainsKey(Hash))
                 {
-                    Main.Instance.ManualLogSource.LogWarning($"Duplicate Replacements: {Font.name}");
+                    Main.Instance.ManualLogSource.LogWarning($"Duplicate Assets: {Font.name}");
                     continue;
                 }
 
