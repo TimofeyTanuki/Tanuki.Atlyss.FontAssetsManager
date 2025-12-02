@@ -123,9 +123,7 @@ public class Replacement
             if (!Replacement.Rule.IsMatch(TMP_Text.name, TMP_Text.font.name))
                 continue;
 
-            Main.Instance.ManualLogSource.LogDebug($"RPL Obj:{TMP_Text.transform.name}|Font:{TMP_Text.font.name}");
             TMP_Text.font = Replacement.Asset;
-
             break;
         }
     }
@@ -139,9 +137,7 @@ public class Replacement
             if (!Replacement.Rule.IsMatch(Text.name, Text.font.name))
                 continue;
 
-            Main.Instance.ManualLogSource.LogDebug($"RPL Obj:{Text.name}|Font:{Text.font.name}");
             Text.font = Replacement.Asset;
-
             break;
         }
     }
