@@ -8,15 +8,15 @@ using TMPro;
 
 namespace Tanuki.Atlyss.FontAssetsManager.Managers;
 
-public class Fallback
+public class Fallbacks
 {
     private const string DirectoryName = "Fallbacks";
-    public static Fallback Instance;
+    public static Fallbacks Instance;
 
-    private string ReplacementConfigurationsPath;
-    public readonly List<Models.Fallback> Assets;
+    private string Directory;
+    public readonly List<Fallback> Assets;
 
-    private Fallback() =>
+    private Fallbacks() =>
         Assets = [];
 
     public static void Initialize()
@@ -26,22 +26,22 @@ public class Fallback
 
         Instance = new()
         {
-            ReplacementConfigurationsPath = Path.Combine(Paths.ConfigPath, Main.Instance.Name, DirectoryName)
+            Directory = Path.Combine(Paths.ConfigPath, Main.Instance.Name, DirectoryName)
         };
     }
 
     public void Load()
     {
-        if (!Directory.Exists(ReplacementConfigurationsPath))
-            Directory.CreateDirectory(ReplacementConfigurationsPath);
+        if (!System.IO.Directory.Exists(Directory))
+            System.IO.Directory.CreateDirectory(Directory);
 
         List<Models.Configuration.Fallback> Configuration;
 
         Rule Rule;
         TMP_FontAsset TMP_FontAsset;
-        Models.Fallback CurrentFallback;
+        Fallback CurrentFallback;
         HashSet<TMP_FontAsset> Fallbacks = [];
-        foreach (string File in Directory.GetFiles(ReplacementConfigurationsPath, "*.json"))
+        foreach (string File in System.IO.Directory.GetFiles(Directory, "*.json"))
         {
             Configuration = JsonConvert.DeserializeObject<List<Models.Configuration.Fallback>>(System.IO.File.ReadAllText(File));
 
@@ -49,21 +49,21 @@ public class Fallback
             {
                 try
                 {
-                    Rule = new(new Regex(Fallback.Rule.ObjectName), new Regex(Fallback.Rule.FontName));
+                    Rule = new(new Regex(Fallback.Rule.Object), new Regex(Fallback.Rule.Font));
                 }
                 catch
                 {
-                    Main.Instance.ManualLogSource.LogWarning("Invalid regex rule");
+                    Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("Fallbacks.InvalidRegex", File));
                     continue;
                 }
 
                 Fallbacks.Clear();
-                foreach (Models.Configuration.Asset Asset in Fallback.Fallbacks)
+                foreach (Models.Configuration.Asset Asset in Fallback.Assets)
                 {
-                    TMP_FontAsset = AssetBundles.Instance.GetFontAssetTMP(Asset.AssetBundle, Asset.Name);
+                    TMP_FontAsset = AssetBundles.Instance.GetAssetObject<TMP_FontAsset>(Asset.Bundle, Asset.Object);
                     if (TMP_FontAsset is null)
                     {
-                        Main.Instance.ManualLogSource.LogWarning("fallback not found =(");
+                        Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("Fallbacks.AssetNotFound", Asset.Object, Asset.Bundle, File));
                         continue;
                     }
 
@@ -74,7 +74,7 @@ public class Fallback
                     continue;
 
                 CurrentFallback = null;
-                foreach (Models.Fallback OtherFallback in Assets)
+                foreach (Fallback OtherFallback in Assets)
                 {
                     if (!OtherFallback.Rule.Equals(Fallback.Rule))
                         continue;
@@ -93,19 +93,26 @@ public class Fallback
                     CurrentFallback.Fixed = Fallback.Fixed;
 
                     if (CurrentFallback.Fixed)
+                    {
+                        foreach (TMP_FontAsset Asset in CurrentFallback.Assets)
+                            AssetBundles.Instance.Unuse(Asset, true);
+
                         CurrentFallback.Assets.Clear();
+                    }
                 }
-                Main.Instance.ManualLogSource.LogDebug("D6");
+
                 foreach (TMP_FontAsset Asset in Fallbacks)
+                {
                     CurrentFallback.Assets.Add(Asset);
+                    AssetBundles.Instance.Use(Asset);
+                }
             }
         }
-
-        Main.Instance.ManualLogSource.LogDebug($"Fallback rules (x{this.Assets.Count})");
     }
+    public void Unload() => Assets.Clear();
     public void Handle(TMP_Text TMP_Text)
     {
-        foreach (Models.Fallback Fallback in Assets)
+        foreach (Fallback Fallback in Assets)
         {
             if (!Fallback.Rule.IsMatch(TMP_Text.name, TMP_Text.font.name))
                 continue;
@@ -126,6 +133,4 @@ public class Fallback
             break;
         }
     }
-
-    public void Unload() => Assets.Clear();
 }

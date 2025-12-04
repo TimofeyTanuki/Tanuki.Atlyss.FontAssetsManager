@@ -6,9 +6,11 @@ namespace Tanuki.Atlyss.FontAssetsManager.Models.Configuration;
 [Serializable]
 internal struct Asset
 {
-    [JsonProperty("AssetBundle")]
-    public string AssetBundle;
+#pragma warning disable CS0649
+    [JsonProperty("Bundle")]
+    public string Bundle;
 
-    [JsonProperty("Name")]
-    public string Name;
+    [JsonProperty("Object")]
+    public string Object;
+#pragma warning restore CS0649
 }

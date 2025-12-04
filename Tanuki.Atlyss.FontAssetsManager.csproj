@@ -94,9 +94,10 @@
   <ItemGroup>
     <Compile Include="Configuration.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="Managers\Fallback.cs" />
-    <Compile Include="Managers\Replacement.cs" />
+    <Compile Include="Managers\Fallbacks.cs" />
+    <Compile Include="Managers\Replacements.cs" />
     <Compile Include="Managers\AssetBundles.cs" />
+    <Compile Include="Models\Asset.cs" />
     <Compile Include="Models\Configuration\Debug.cs" />
     <Compile Include="Models\Configuration\Fallback.cs" />
     <Compile Include="Models\Configuration\General.cs" />

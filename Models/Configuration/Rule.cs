@@ -6,9 +6,11 @@ namespace Tanuki.Atlyss.FontAssetsManager.Models.Configuration;
 [Serializable]
 internal struct Rule
 {
-    [JsonProperty("ObjectName")]
-    public string ObjectName;
+#pragma warning disable CS0649
+    [JsonProperty("Object")]
+    public string Object;
 
-    [JsonProperty("FontName")]
-    public string FontName;
+    [JsonProperty("Font")]
+    public string Font;
+#pragma warning restore CS0649
 }
