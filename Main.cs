@@ -27,13 +27,13 @@ internal class Main : Plugin
         AssetBundles.Initialize();
         Replacements.Initialize();
         Fallbacks.Initialize();
-
-        AssetBundles.Instance.OnAssetsRefreshed += AssetBundles_OnAssetsRefreshed;
     }
 
     protected override void Load()
     {
         Configuration.Instance.Load(Config);
+
+        AssetBundles.Instance.OnAssetsRefreshed += AssetBundles_OnAssetsRefreshed;
         AssetBundles.Instance.Refresh();
 
         if (Configuration.Instance.Debug.TMP_Text_OnEnable.Value)
@@ -52,15 +52,12 @@ internal class Main : Plugin
         if (Configuration.Instance.General.ReplaceUnknownCharactersWithCodes.Value)
             Patches.ChatBehaviour.UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix.OnInvoke += UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix_OnInvoke;
 
-        if (Configuration.Instance.General.UnloadUnusedAssets.Value)
-            AssetBundles.Instance.UnloadUnusedAssets();
-
         Harmony.PatchAll();
     }
     private void AssetBundles_OnAssetsRefreshed()
     {
-        Replacements.Instance.Load();
-        Fallbacks.Instance.Load();
+        Replacements.Instance.Reload();
+        Fallbacks.Instance.Reload();
 
         if (Configuration.Instance.General.UnloadUnusedAssets.Value)
             AssetBundles.Instance.UnloadUnusedAssets();
@@ -114,8 +111,8 @@ internal class Main : Plugin
 
         AssetBundles.Instance.OnAssetsRefreshed -= AssetBundles_OnAssetsRefreshed;
 
-        Replacements.Instance.Unload();
-        Fallbacks.Instance.Unload();
+        Replacements.Instance.Reset();
+        Fallbacks.Instance.Reset();
 
         Harmony.UnpatchSelf();
     }

@@ -35,7 +35,7 @@ public class Replacements
         };
     }
 
-    public void Load()
+    public void Reload()
     {
         if (!System.IO.Directory.Exists(Directory))
             System.IO.Directory.CreateDirectory(Directory);
@@ -141,7 +141,7 @@ public class Replacements
             break;
         }
     }
-    public void Unload()
+    public void Reset()
     {
         Assets.Clear();
         AssetsTMP.Clear();

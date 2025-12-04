@@ -10,7 +10,7 @@ internal struct Replacement
     [JsonProperty("Asset")]
     public Asset Asset;
 
-    [JsonProperty("Rules")]
+    [JsonProperty("Rule")]
     public Rule Rule;
 #pragma warning restore CS0649
 }

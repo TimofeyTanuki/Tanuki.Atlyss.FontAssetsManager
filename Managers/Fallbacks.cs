@@ -30,7 +30,7 @@ public class Fallbacks
         };
     }
 
-    public void Load()
+    public void Reload()
     {
         if (!System.IO.Directory.Exists(Directory))
             System.IO.Directory.CreateDirectory(Directory);
@@ -109,7 +109,7 @@ public class Fallbacks
             }
         }
     }
-    public void Unload() => Assets.Clear();
+    public void Reset() => Assets.Clear();
     public void Handle(TMP_Text TMP_Text)
     {
         foreach (Fallback Fallback in Assets)
