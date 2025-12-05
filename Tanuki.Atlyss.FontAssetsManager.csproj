@@ -26,7 +26,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\plugins\</OutputPath>
+    <OutputPath>D:\Programs\Steam\steamapps\common\ATLYSS\BepInEx\plugins\Tanuki.Atlyss.FontAssetsManager\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -109,6 +109,7 @@
     <Compile Include="Models\Replacement.cs" />
     <Compile Include="Models\Rule.cs" />
     <Compile Include="Patches\ChatBehaviour\UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix.cs" />
+    <Compile Include="Patches\TMPro\TMP_Text\Text_Setter_Prefix.cs" />
     <Compile Include="Patches\UnityEngine\UI\Text\OnEnable_Postfix.cs" />
     <Compile Include="Patches\TMPro\TextMeshProUGUI\OnEnable_Postfix.cs" />
     <Compile Include="Patches\TMPro\TextMeshPro\OnEnable_Postfix.cs" />

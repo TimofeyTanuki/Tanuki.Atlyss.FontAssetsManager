@@ -13,5 +13,5 @@ public class Rule(Regex ObjectName, Regex FontName) : IEquatable<Rule>
         this.ObjectName.IsMatch(ObjectName) && this.FontName.IsMatch(FontName);
 
     public bool Equals(Rule Other) =>
-        ObjectName.Equals(Other.ObjectName) && FontName.Equals(Other.FontName);
+        ObjectName.ToString() == Other.ObjectName.ToString() && FontName.ToString() == Other.FontName.ToString();
 }

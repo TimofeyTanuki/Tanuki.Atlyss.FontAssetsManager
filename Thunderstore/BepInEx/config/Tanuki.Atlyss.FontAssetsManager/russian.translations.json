@@ -1,1 +1,10 @@
-{}
+{
+  "AssetBundles.FailedToLoad": "Не удалось загрузить пакет \"{0}\".\n{1}",
+  "AssetBundles.Duplicate": "Дублирующийся объект \"{0}\" ({1}) в пакете \"{2}\".",
+  "Fallbacks.InvalidRegex": "Ошибка при чтении регулярного выражения в конфигурации.\n{0}",
+  "Fallbacks.AssetNotFound": "Объект \"{0}\" из пакета \"{1}\" не найден.\n{2}",
+  "Replacements.InvalidRegex": "Ошибка при чтении регулярного выражения конфигурации.\n{0}",
+  "Replacements.AssetNotFound": "Объект \"{0}\" из пакета \"{1}\" не найден.\n{2}",
+  "Debug.TMP_Text.OnEnable": "TMP_Text\nОбъект: {0}\nШрифт: {1}",
+  "Debug.Text.OnEnable": "Text\nОбъект: {0}\nШрифт: {1}"
+}

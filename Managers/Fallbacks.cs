@@ -76,7 +76,9 @@ public class Fallbacks
                 CurrentFallback = null;
                 foreach (Fallback OtherFallback in Assets)
                 {
-                    if (!OtherFallback.Rule.Equals(Fallback.Rule))
+                    Main.Instance.ManualLogSource.LogInfo($"isnull? {Rule.Equals(OtherFallback.Rule)}");
+                    Main.Instance.ManualLogSource.LogInfo($"eq? {Rule.Equals(OtherFallback.Rule)}");
+                    if (!Rule.Equals(OtherFallback.Rule))
                         continue;
 
                     CurrentFallback = OtherFallback;
@@ -90,15 +92,16 @@ public class Fallbacks
                 }
                 else
                 {
-                    CurrentFallback.Fixed = Fallback.Fixed;
-
-                    if (CurrentFallback.Fixed)
+                    if (CurrentFallback.Fixed || Fallback.Fixed)
                     {
                         foreach (TMP_FontAsset Asset in CurrentFallback.Assets)
                             AssetBundles.Instance.Unuse(Asset, true);
 
                         CurrentFallback.Assets.Clear();
+                        Main.Instance.ManualLogSource.LogInfo($"Unused {CurrentFallback.Assets.Count}");
                     }
+
+                    CurrentFallback.Fixed = Fallback.Fixed;
                 }
 
                 foreach (TMP_FontAsset Asset in Fallbacks)

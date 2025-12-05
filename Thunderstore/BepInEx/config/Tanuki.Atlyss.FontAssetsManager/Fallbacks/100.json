@@ -1,0 +1,33 @@
+[
+  {
+    "Rule":
+    {
+      "Object": ".*",
+      "Font": ".*"
+    },
+    "Fixed": false,
+    "Assets":
+    [
+      {
+        "Bundle": "tanuki.atlyss.fontassetsmanager.assets.noto_sans",
+        "Object": "SDF"
+      },
+      {
+        "Bundle": "tanuki.atlyss.fontassetsmanager.assets.noto_sans_arabic",
+        "Object": "SDF"
+      },
+      {
+        "Bundle": "tanuki.atlyss.fontassetsmanager.assets.noto_sans_japanese",
+        "Object": "SDF"
+      },
+      {
+        "Bundle": "tanuki.atlyss.fontassetsmanager.assets.noto_sans_korean",
+        "Object": "SDF"
+      },
+      {
+        "Bundle": "tanuki.atlyss.fontassetsmanager.assets.noto_sans_traditional_chinese",
+        "Object": "SDF"
+      }
+    ]
+  }
+]

@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Tanuki.Atlyss.FontAssetsManager")]
-[assembly: AssemblyDescription("Plugin for Atlyss that manages custom font assets.")]
+[assembly: AssemblyDescription("Plugin for Atlyss for customizing in-game fonts. Use custom fonts, replace existing ones, add fallbacks, and prevent missing characters from being displayed.")]
 [assembly: AssemblyCompany("Tanuki")]
 [assembly: AssemblyProduct("Tanuki.Atlyss.FontAssetsManager")]
 [assembly: AssemblyCopyright("Copyright © Tanuki 2025")]

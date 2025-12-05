@@ -38,6 +38,9 @@ public class AssetBundles
     }
     public void Refresh()
     {
+        if (Assets.Count > 0)
+            return;
+
         if (!Directory.Exists(Instance.AssetBundlesPath))
             Directory.CreateDirectory(Instance.AssetBundlesPath);
 
@@ -83,6 +86,8 @@ public class AssetBundles
                 Assets.Add(Hash, new(Font));
                 ObjectHashes.Add(Font, Hash);
             }
+
+            AssetBundle.Unload(false);
         }
 
         OnAssetsRefreshed?.Invoke();

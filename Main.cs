@@ -50,9 +50,33 @@ internal class Main : Plugin
         Patches.TMPro.TextMeshPro.OnEnable_Prefix.OnInvoke += TextMeshPro_OnEnable_Prefix_OnInvoke;
 
         if (Configuration.Instance.General.ReplaceUnknownCharactersWithCodes.Value)
-            Patches.ChatBehaviour.UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix.OnInvoke += UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix_OnInvoke;
+            Patches.TMPro.TMP_Text.Text_Setter_Prefix.OnInvoke += TMPro_TMP_Text_Text_Setter_Prefix_OnInvoke;
 
         Harmony.PatchAll();
+    }
+
+    private void TMPro_TMP_Text_Text_Setter_Prefix_OnInvoke(TMP_Text __instance, ref string value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return;
+
+        if (!__instance.font)
+            return;
+
+        StringBuilder StringBuilder = new();
+
+        foreach (char Character in value)
+        {
+            if (__instance.font.HasCharacter(Character, true))
+            {
+                StringBuilder.Append(Character);
+                continue;
+            }
+
+            StringBuilder.Append($"\\u{Convert.ToInt32(Character)}");
+        }
+
+        value = StringBuilder.ToString();
     }
     private void AssetBundles_OnAssetsRefreshed()
     {
@@ -83,27 +107,10 @@ internal class Main : Plugin
         Replacements.Instance.Handle(Instance);
         Fallbacks.Instance.Handle(Instance);
     }
-    private void UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix_OnInvoke(ref string Message)
-    {
-        StringBuilder StringBuilder = new();
-
-        foreach (char Character in Message)
-        {
-            if (ChatBehaviour._current._chatAssets._chatText.font.HasCharacter(Character, true))
-            {
-                StringBuilder.Append(Character);
-                continue;
-            }
-
-            StringBuilder.Append($"\\u{Convert.ToInt32(Character)}");
-        }
-
-        Message = StringBuilder.ToString();
-    }
     protected override void Unload()
     {
         if (Configuration.Instance.General.ReplaceUnknownCharactersWithCodes.Value)
-            Patches.ChatBehaviour.UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix.OnInvoke -= UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel_Prefix_OnInvoke;
+            Patches.TMPro.TMP_Text.Text_Setter_Prefix.OnInvoke -= TMPro_TMP_Text_Text_Setter_Prefix_OnInvoke;
 
         Patches.UnityEngine.UI.Text.OnEnable_Prefix.OnInvoke -= Text_OnEnable_Prefix_OnInvoke;
         Patches.TMPro.TextMeshProUGUI.OnEnable_Prefix.OnInvoke -= TextMeshProUGUI_OnEnable_Prefix_OnInvoke;

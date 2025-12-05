@@ -1,0 +1,26 @@
+[
+  {
+    "Asset":
+    {
+      "Bundle": "tanuki.atlyss.fontassetsmanager.assets.noto_sans",
+      "Object": "Font"
+    },
+    "Rule":
+    {
+      "Object": ".*",
+      "Font": ".*"
+    }
+  },
+  {
+    "Asset":
+    {
+      "Bundle": "tanuki.atlyss.fontassetsmanager.assets.noto_sans",
+      "Object": "SDF"
+    },
+    "Rule":
+    {
+      "Object": ".*",
+      "Font": ".*"
+    }
+  }
+]
