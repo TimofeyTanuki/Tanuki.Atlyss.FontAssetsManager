@@ -55,7 +55,7 @@ public class Replacements
 
                 if (Font is null && TMP_FontAsset is null)
                 {
-                    Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("Replacements.AssetNotFound", Replacement.Asset.Object, Replacement.Asset.Bundle, File));
+                    Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("Replacement.AssetNotFound", Replacement.Asset.Object, Replacement.Asset.Bundle, File));
                     continue;
                 }
 
@@ -65,7 +65,7 @@ public class Replacements
                 }
                 catch
                 {
-                    Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("Replacements.InvalidRegex", File));
+                    Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("Replacement.InvalidRegex", File));
                     continue;
                 }
 

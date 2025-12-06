@@ -1,5 +1,4 @@
 ﻿using BepInEx;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using Tanuki.Atlyss.FontAssetsManager.Models;
@@ -14,22 +13,29 @@ public class AssetBundles
     public static AssetBundles Instance;
 
     public delegate void AssetsRefreshed();
-    public event AssetsRefreshed OnAssetsRefreshed;
+    public event AssetsRefreshed OnAssetsRefreshFinished;
+
+    public delegate void BeforeAssetsRefresh();
+    public event BeforeAssetsRefresh OnBeforeAssetsRefresh;
 
     private string AssetBundlesPath;
     private readonly Dictionary<ulong, Asset> Assets;
-    private readonly Dictionary<UnityEngine.Object, ulong> ObjectHashes;
+    private readonly Dictionary<Object, ulong> AssetHashes;
+    private ushort PendingRefreshes;
+
+    public bool Refreshing => PendingRefreshes > 0;
 
     private AssetBundles()
     {
         Assets = [];
-        ObjectHashes = [];
+        AssetHashes = [];
     }
 
     public static void Initialize()
     {
         if (Instance is not null)
             return;
+
 
         Instance = new()
         {
@@ -38,59 +44,73 @@ public class AssetBundles
     }
     public void Refresh()
     {
-        if (Assets.Count > 0)
-            return;
-
         if (!Directory.Exists(Instance.AssetBundlesPath))
             Directory.CreateDirectory(Instance.AssetBundlesPath);
 
-        AssetBundle AssetBundle;
-        ulong Hash;
-        string TypeName;
-        foreach (string File in Directory.GetFiles(Instance.AssetBundlesPath, "*.assetbundle"))
+        string[] Files = Directory.GetFiles(Instance.AssetBundlesPath, "*.assetbundle");
+        PendingRefreshes = (ushort)Files.Length;
+
+        OnBeforeAssetsRefresh?.Invoke();
+
+        AssetBundleCreateRequest AssetBundleCreateRequest;
+        foreach (string File in Files)
         {
-            try
+            AssetBundleCreateRequest = AssetBundle.LoadFromFileAsync(File);
+            AssetBundleCreateRequest.completed += OnAssetBundleLoaded;
+        }
+    }
+    private void OnAssetBundleLoaded(AsyncOperation AsyncOperation)
+    {
+        AssetBundleCreateRequest AssetBundleCreateRequest = AsyncOperation as AssetBundleCreateRequest;
+        AssetBundle AssetBundle = AssetBundleCreateRequest.assetBundle;
+
+        if (!AssetBundle)
+        {
+            OnAssetBundleProcessFinished();
+            return;
+        }
+
+        ulong Hash;
+
+        foreach (TMP_FontAsset TMP_FontAsset in AssetBundle.LoadAllAssets<TMP_FontAsset>())
+        {
+            Hash = GetAssetHash(AssetBundle.name, TMP_FontAsset.name);
+            if (Assets.ContainsKey(Hash))
             {
-                AssetBundle = UnityEngine.AssetBundle.LoadFromFile(File);
-            }
-            catch (Exception Exception)
-            {
-                Main.Instance.ManualLogSource.LogError(Main.Instance.Translate("AssetBundles.FailedToLoad", File, Exception));
+                Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("AssetBundle.Duplicate", nameof(TMP_FontAsset.name), AssetBundle.name));
                 continue;
             }
 
-            TypeName = typeof(TMP_FontAsset).Name;
-            foreach (TMP_FontAsset TMP_FontAsset in AssetBundle.LoadAllAssets<TMP_FontAsset>())
-            {
-                Hash = GetAssetHash(AssetBundle.name, TMP_FontAsset.name);
-                if (Assets.ContainsKey(Hash))
-                {
-                    Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("AssetBundles.Duplicate", TMP_FontAsset.name, TypeName, File));
-                    continue;
-                }
-
-                Assets.Add(Hash, new(TMP_FontAsset));
-                ObjectHashes.Add(TMP_FontAsset, Hash);
-            }
-
-            TypeName = typeof(Font).Name;
-            foreach (Font Font in AssetBundle.LoadAllAssets<Font>())
-            {
-                Hash = GetAssetHash(AssetBundle.name, Font.name);
-                if (Assets.ContainsKey(Hash))
-                {
-                    Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("AssetBundles.Duplicate", Font.name, TypeName, File));
-                    continue;
-                }
-
-                Assets.Add(Hash, new(Font));
-                ObjectHashes.Add(Font, Hash);
-            }
-
-            AssetBundle.Unload(false);
+            Assets.Add(Hash, new(TMP_FontAsset));
+            AssetHashes.Add(TMP_FontAsset, Hash);
         }
 
-        OnAssetsRefreshed?.Invoke();
+        foreach (Font Font in AssetBundle.LoadAllAssets<Font>())
+        {
+            Hash = GetAssetHash(AssetBundle.name, Font.name);
+            if (Assets.ContainsKey(Hash))
+            {
+                Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("AssetBundle.Duplicate", nameof(Font.name), AssetBundle.name));
+                continue;
+            }
+
+            Assets.Add(Hash, new(Font));
+            AssetHashes.Add(Font, Hash);
+        }
+
+        AssetBundleUnloadOperation AssetBundleUnloadOperation = AssetBundle.UnloadAsync(true);
+        AssetBundleUnloadOperation.completed += OnAssetBundleUnloaded;
+    }
+    private void OnAssetBundleUnloaded(AsyncOperation AsyncOperation) =>
+        OnAssetBundleProcessFinished();
+    private void OnAssetBundleProcessFinished()
+    {
+        PendingRefreshes--;
+
+        if (PendingRefreshes > 0)
+            return;
+
+        OnAssetsRefreshFinished?.Invoke();
     }
     private ulong GetAssetHash(string AssetBundle, string AssetName) =>
         ((ulong)AssetBundle.GetHashCode() << 32) | (uint)AssetName.GetHashCode();
@@ -106,16 +126,16 @@ public class AssetBundles
 
         return Asset.Object as T;
     }
-    public void Use(UnityEngine.Object Object)
+    public void Use(Object Object)
     {
-        if (!ObjectHashes.TryGetValue(Object, out ulong Hash))
+        if (!AssetHashes.TryGetValue(Object, out ulong Hash))
             return;
 
         Assets[Hash].Uses++;
     }
-    public void Unuse(UnityEngine.Object Object, bool PreventUnload)
+    public void Unuse(Object Object, bool PreventUnload)
     {
-        if (!ObjectHashes.TryGetValue(Object, out ulong Hash))
+        if (!AssetHashes.TryGetValue(Object, out ulong Hash))
             return;
 
         Asset Asset = Assets[Hash];
@@ -127,10 +147,10 @@ public class AssetBundles
             return;
 
         Assets.Remove(Hash);
-        ObjectHashes.Remove(Object);
-        UnityEngine.Object.Destroy(Object);
+        AssetHashes.Remove(Object);
+        Object.Destroy(Object);
     }
-    public void UnloadUnusedAssets()
+    public void DestroyUnusedAssets()
     {
         List<ulong> Unused = [];
         foreach (KeyValuePair<ulong, Asset> Asset in Assets)
@@ -141,12 +161,12 @@ public class AssetBundles
             Unused.Add(Asset.Key);
         }
 
-        UnityEngine.Object Object;
+        Object Object;
         foreach (ulong Hash in Unused)
         {
             Object = Assets[Hash].Object;
             Assets.Remove(Hash);
-            ObjectHashes.Remove(Object);
+            AssetHashes.Remove(Object);
             UnityEngine.Object.Destroy(Object);
         }
     }

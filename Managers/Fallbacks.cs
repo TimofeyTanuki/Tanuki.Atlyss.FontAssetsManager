@@ -53,7 +53,7 @@ public class Fallbacks
                 }
                 catch
                 {
-                    Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("Fallbacks.InvalidRegex", File));
+                    Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("Fallback.InvalidRegex", File));
                     continue;
                 }
 
@@ -63,7 +63,7 @@ public class Fallbacks
                     TMP_FontAsset = AssetBundles.Instance.GetAssetObject<TMP_FontAsset>(Asset.Bundle, Asset.Object);
                     if (TMP_FontAsset is null)
                     {
-                        Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("Fallbacks.AssetNotFound", Asset.Object, Asset.Bundle, File));
+                        Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("Fallback.AssetNotFound", Asset.Object, Asset.Bundle, File));
                         continue;
                     }
 
@@ -76,8 +76,6 @@ public class Fallbacks
                 CurrentFallback = null;
                 foreach (Fallback OtherFallback in Assets)
                 {
-                    Main.Instance.ManualLogSource.LogInfo($"isnull? {Rule.Equals(OtherFallback.Rule)}");
-                    Main.Instance.ManualLogSource.LogInfo($"eq? {Rule.Equals(OtherFallback.Rule)}");
                     if (!Rule.Equals(OtherFallback.Rule))
                         continue;
 
@@ -98,7 +96,6 @@ public class Fallbacks
                             AssetBundles.Instance.Unuse(Asset, true);
 
                         CurrentFallback.Assets.Clear();
-                        Main.Instance.ManualLogSource.LogInfo($"Unused {CurrentFallback.Assets.Count}");
                     }
 
                     CurrentFallback.Fixed = Fallback.Fixed;

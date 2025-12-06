@@ -16,24 +16,25 @@ internal class Main : Plugin
 {
     internal static Main Instance;
     internal ManualLogSource ManualLogSource;
-    private readonly Harmony Harmony = new(PluginInfo.GUID);
 
     internal void Awake()
     {
         Instance = this;
         ManualLogSource = Logger;
 
+        Harmony Harmony = new(PluginInfo.GUID);
+        Harmony.PatchAll();
+
         Configuration.Initialize();
         AssetBundles.Initialize();
         Replacements.Initialize();
         Fallbacks.Initialize();
-    }
 
+        AssetBundles.Instance.OnAssetsRefreshFinished += AssetBundles_OnAssetsRefreshed;
+    }
     protected override void Load()
     {
         Configuration.Instance.Load(Config);
-
-        AssetBundles.Instance.OnAssetsRefreshed += AssetBundles_OnAssetsRefreshed;
         AssetBundles.Instance.Refresh();
 
         if (Configuration.Instance.Debug.TMP_Text_OnEnable.Value)
@@ -51,8 +52,6 @@ internal class Main : Plugin
 
         if (Configuration.Instance.General.ReplaceUnknownCharactersWithCodes.Value)
             Patches.TMPro.TMP_Text.Text_Setter_Prefix.OnInvoke += TMPro_TMP_Text_Text_Setter_Prefix_OnInvoke;
-
-        Harmony.PatchAll();
     }
 
     private void TMPro_TMP_Text_Text_Setter_Prefix_OnInvoke(TMP_Text __instance, ref string value)
@@ -84,7 +83,7 @@ internal class Main : Plugin
         Fallbacks.Instance.Reload();
 
         if (Configuration.Instance.General.UnloadUnusedAssets.Value)
-            AssetBundles.Instance.UnloadUnusedAssets();
+            AssetBundles.Instance.DestroyUnusedAssets();
     }
     private void TMP_Text_OnEnable_Log(TMP_Text Instance) =>
         Logger.LogDebug(Translate("Debug.TMP_Text.OnEnable", Instance.name, Instance.font.name));
@@ -112,15 +111,20 @@ internal class Main : Plugin
         if (Configuration.Instance.General.ReplaceUnknownCharactersWithCodes.Value)
             Patches.TMPro.TMP_Text.Text_Setter_Prefix.OnInvoke -= TMPro_TMP_Text_Text_Setter_Prefix_OnInvoke;
 
+        if (Configuration.Instance.Debug.TMP_Text_OnEnable.Value)
+        {
+            Patches.TMPro.TextMeshProUGUI.OnEnable_Prefix.OnInvoke += TMP_Text_OnEnable_Log;
+            Patches.TMPro.TextMeshPro.OnEnable_Prefix.OnInvoke += TMP_Text_OnEnable_Log;
+        }
+
+        if (Configuration.Instance.Debug.Text_OnEnable.Value)
+            Patches.UnityEngine.UI.Text.OnEnable_Prefix.OnInvoke += Text_OnEnable_Log;
+
         Patches.UnityEngine.UI.Text.OnEnable_Prefix.OnInvoke -= Text_OnEnable_Prefix_OnInvoke;
         Patches.TMPro.TextMeshProUGUI.OnEnable_Prefix.OnInvoke -= TextMeshProUGUI_OnEnable_Prefix_OnInvoke;
         Patches.TMPro.TextMeshPro.OnEnable_Prefix.OnInvoke -= TextMeshPro_OnEnable_Prefix_OnInvoke;
 
-        AssetBundles.Instance.OnAssetsRefreshed -= AssetBundles_OnAssetsRefreshed;
-
         Replacements.Instance.Reset();
         Fallbacks.Instance.Reset();
-
-        Harmony.UnpatchSelf();
     }
 }
