@@ -1,10 +1,9 @@
 {
-  "AssetBundles.FailedToLoad": "Failed to load asset bundle \"{0}\".\n{1}",
-  "AssetBundles.Duplicate": "Duplicate object  \"{0}\" ({1}) in asset bundle \"{2}\".",
-  "Fallbacks.InvalidRegex": "Error reading regular expression in configuration.\n{0}",
-  "Fallbacks.AssetNotFound": "Object \"{0}\" from asset bundle \"{1}\" not found.\n{2}",
-  "Replacements.InvalidRegex": "Error reading regular expression in configuration.\n{0}",
-  "Replacements.AssetNotFound": "Object \"{0}\" from asset bundle \"{1}\" not found.\n{2}",
+  "AssetBundle.Duplicate": "Duplicate object  \"{0}\" ({1}) in asset bundle \"{2}\".",
+  "Fallback.InvalidRegex": "Error reading regular expression in configuration.\n{0}",
+  "Fallback.AssetNotFound": "Object \"{0}\" from asset bundle \"{1}\" not found.\n{2}",
+  "Replacement.InvalidRegex": "Error reading regular expression in configuration.\n{0}",
+  "Replacement.AssetNotFound": "Object \"{0}\" from asset bundle \"{1}\" not found.\n{2}",
   "Debug.TMP_Text.OnEnable": "TMP_Text\nObject: {0}\nFont: {1}",
   "Debug.Text.OnEnable": "Text\nObject: {0}\nFont: {1}"
 }

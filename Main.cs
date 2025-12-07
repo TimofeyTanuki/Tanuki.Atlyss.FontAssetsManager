@@ -1,8 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using System;
-using System.Text;
 using Tanuki.Atlyss.Core.Plugins;
 using Tanuki.Atlyss.FontAssetsManager.Managers;
 using TMPro;
@@ -12,10 +10,12 @@ namespace Tanuki.Atlyss.FontAssetsManager;
 
 [BepInPlugin(PluginInfo.GUID, "Tanuki.Atlyss.FontAssetsManager", PluginInfo.Version)]
 [BepInDependency("9c00d52e-10b8-413f-9ee4-bfde81762442", BepInDependency.DependencyFlags.HardDependency)]
+[BepInDependency(NessieEasySettings.GUID, BepInDependency.DependencyFlags.SoftDependency)]
 internal class Main : Plugin
 {
     internal static Main Instance;
     internal ManualLogSource ManualLogSource;
+    private bool Reloaded = false;
 
     internal void Awake()
     {
@@ -26,15 +26,25 @@ internal class Main : Plugin
         Harmony.PatchAll();
 
         Configuration.Initialize();
+        Configuration.Instance.Load(Config);
+
         AssetBundles.Initialize();
+        AssetBundles.Instance.OnAssetsRefreshFinished += AssetBundles_OnAssetsRefreshed;
+
         Replacements.Initialize();
         Fallbacks.Initialize();
+        UnknownCharactersReplace.Initialize();
 
-        AssetBundles.Instance.OnAssetsRefreshFinished += AssetBundles_OnAssetsRefreshed;
+        if (BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(NessieEasySettings.GUID))
+            NessieEasySettings.Initialize();
     }
     protected override void Load()
     {
-        Configuration.Instance.Load(Config);
+        if (Reloaded)
+        {
+            Config.Reload();
+            Configuration.Instance.Load(Config);
+        }
 
         if (!AssetBundles.Instance.Refreshing)
             AssetBundles.Instance.Refresh();
@@ -51,33 +61,7 @@ internal class Main : Plugin
         Patches.UnityEngine.UI.Text.OnEnable_Prefix.OnInvoke += Text_OnEnable_Prefix_OnInvoke;
         Patches.TMPro.TextMeshProUGUI.OnEnable_Prefix.OnInvoke += TextMeshProUGUI_OnEnable_Prefix_OnInvoke;
         Patches.TMPro.TextMeshPro.OnEnable_Prefix.OnInvoke += TextMeshPro_OnEnable_Prefix_OnInvoke;
-
-        if (Configuration.Instance.General.ReplaceUnknownCharactersWithCodes.Value)
-            Patches.TMPro.TMP_Text.Text_Setter_Prefix.OnInvoke += TMPro_TMP_Text_Text_Setter_Prefix_OnInvoke;
-    }
-
-    private void TMPro_TMP_Text_Text_Setter_Prefix_OnInvoke(TMP_Text __instance, ref string value)
-    {
-        if (string.IsNullOrEmpty(value))
-            return;
-
-        if (!__instance.font)
-            return;
-
-        StringBuilder StringBuilder = new();
-
-        foreach (char Character in value)
-        {
-            if (__instance.font.HasCharacter(Character, true))
-            {
-                StringBuilder.Append(Character);
-                continue;
-            }
-
-            StringBuilder.Append($"\\u{Convert.ToInt32(Character)}");
-        }
-
-        value = StringBuilder.ToString();
+        UnknownCharactersReplace.Instance.Load();
     }
     private void AssetBundles_OnAssetsRefreshed()
     {
@@ -110,8 +94,7 @@ internal class Main : Plugin
     }
     protected override void Unload()
     {
-        if (Configuration.Instance.General.ReplaceUnknownCharactersWithCodes.Value)
-            Patches.TMPro.TMP_Text.Text_Setter_Prefix.OnInvoke -= TMPro_TMP_Text_Text_Setter_Prefix_OnInvoke;
+        Reloaded = true;
 
         if (Configuration.Instance.Debug.TMP_Text_OnEnable.Value)
         {
@@ -128,5 +111,6 @@ internal class Main : Plugin
 
         Replacements.Instance.Reset();
         Fallbacks.Instance.Reset();
+        UnknownCharactersReplace.Instance.Unload();
     }
 }
