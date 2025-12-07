@@ -35,7 +35,9 @@ internal class Main : Plugin
     protected override void Load()
     {
         Configuration.Instance.Load(Config);
-        AssetBundles.Instance.Refresh();
+
+        if (!AssetBundles.Instance.Refreshing)
+            AssetBundles.Instance.Refresh();
 
         if (Configuration.Instance.Debug.TMP_Text_OnEnable.Value)
         {

@@ -21,7 +21,7 @@ public class AssetBundles
     private string AssetBundlesPath;
     private readonly Dictionary<ulong, Asset> Assets;
     private readonly Dictionary<Object, ulong> AssetHashes;
-    private ushort PendingRefreshes;
+    private ushort PendingRefreshes = 0;
 
     public bool Refreshing => PendingRefreshes > 0;
 
