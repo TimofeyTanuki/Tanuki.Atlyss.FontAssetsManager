@@ -39,11 +39,14 @@ public class AssetBundles
 
         Instance = new()
         {
-            AssetBundlesPath = Path.Combine(Paths.PluginPath, Main.Instance.Name, AssetBundlesDirectory)
+            AssetBundlesPath = Path.Combine(Paths.ConfigPath, Main.Instance.Name, AssetBundlesDirectory)
         };
     }
-    public void Refresh()
+    internal void Refresh()
     {
+        if (Assets.Count > 0)
+            return;
+
         if (!Directory.Exists(Instance.AssetBundlesPath))
             Directory.CreateDirectory(Instance.AssetBundlesPath);
 
@@ -77,7 +80,7 @@ public class AssetBundles
             Hash = GetAssetHash(AssetBundle.name, TMP_FontAsset.name);
             if (Assets.ContainsKey(Hash))
             {
-                Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("AssetBundle.Duplicate", nameof(TMP_FontAsset.name), AssetBundle.name));
+                Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("AssetBundle.Duplicate", TMP_FontAsset.name, nameof(TMP_FontAsset.name), AssetBundle.name));
                 continue;
             }
 
@@ -90,7 +93,7 @@ public class AssetBundles
             Hash = GetAssetHash(AssetBundle.name, Font.name);
             if (Assets.ContainsKey(Hash))
             {
-                Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("AssetBundle.Duplicate", nameof(Font.name), AssetBundle.name));
+                Main.Instance.ManualLogSource.LogWarning(Main.Instance.Translate("AssetBundle.Duplicate", Font.name, nameof(Font.name), AssetBundle.name));
                 continue;
             }
 
@@ -98,7 +101,7 @@ public class AssetBundles
             AssetHashes.Add(Font, Hash);
         }
 
-        AssetBundleUnloadOperation AssetBundleUnloadOperation = AssetBundle.UnloadAsync(true);
+        AssetBundleUnloadOperation AssetBundleUnloadOperation = AssetBundle.UnloadAsync(false);
         AssetBundleUnloadOperation.completed += OnAssetBundleUnloaded;
     }
     private void OnAssetBundleUnloaded(AsyncOperation AsyncOperation) =>

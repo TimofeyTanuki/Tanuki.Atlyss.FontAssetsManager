@@ -108,7 +108,7 @@ This example shows two rules with identical regular expressions, as one of them 
 
 ### Asset bundles
 Path
-> `BepInEx/plugins/Tanuki.Atlyss.FontAssetsManager/AssetBundles/*.assetbundle`
+> `BepInEx/config/Tanuki.Atlyss.FontAssetsManager/AssetBundles/*.assetbundle`
 
 Assets must be of type `Font` (for `Text` objects) or `TMP Font Asset` (for `TextMeshPro` objects) and have unique names in the asset bundle.
 
