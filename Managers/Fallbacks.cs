@@ -41,9 +41,12 @@ public class Fallbacks
         TMP_FontAsset TMP_FontAsset;
         Fallback CurrentFallback;
         HashSet<TMP_FontAsset> Fallbacks = [];
+        ushort AssetsFound;
+
         foreach (string File in System.IO.Directory.GetFiles(Directory, "*.json"))
         {
             Configuration = JsonConvert.DeserializeObject<List<Models.Configuration.Fallback>>(System.IO.File.ReadAllText(File));
+            AssetsFound = 0;
 
             foreach (Models.Configuration.Fallback Fallback in Configuration)
             {
@@ -67,6 +70,7 @@ public class Fallbacks
                         continue;
                     }
 
+                    AssetsFound++;
                     Fallbacks.Add(TMP_FontAsset);
                 }
 
@@ -107,7 +111,19 @@ public class Fallbacks
                     AssetBundles.Instance.Use(Asset);
                 }
             }
+
+            if (AssetsFound > 0)
+                continue;
+
+            RemoveCompletelyUnusedRulesFile(File);
         }
+    }
+    private void RemoveCompletelyUnusedRulesFile(string Path)
+    {
+        if (!Configuration.Instance.General.RemoveCompletelyUnusedRuleFiles.Value)
+            return;
+
+        File.Delete(Path);
     }
     public void Reset() => Assets.Clear();
     public void Handle(TMP_Text TMP_Text)

@@ -9,7 +9,6 @@ namespace Tanuki.Atlyss.FontAssetsManager.Managers;
 
 public class AssetBundles
 {
-    private const string AssetBundlesDirectory = "AssetBundles";
     public static AssetBundles Instance;
 
     public delegate void AssetsRefreshed();
@@ -31,35 +30,28 @@ public class AssetBundles
         AssetHashes = [];
     }
 
-    public static void Initialize()
-    {
-        if (Instance is not null)
-            return;
-
-
-        Instance = new()
-        {
-            AssetBundlesPath = Path.Combine(Paths.ConfigPath, Main.Instance.Name, AssetBundlesDirectory)
-        };
-    }
+    public static void Initialize() => Instance ??= new();
     internal void Refresh()
     {
         if (Assets.Count > 0)
             return;
 
-        if (!Directory.Exists(Instance.AssetBundlesPath))
-            Directory.CreateDirectory(Instance.AssetBundlesPath);
-
-        string[] Files = Directory.GetFiles(Instance.AssetBundlesPath, "*.assetbundle");
-        PendingRefreshes = (ushort)Files.Length;
-
+        PendingRefreshes = 0;
         OnBeforeAssetsRefresh?.Invoke();
 
+        string[] Directories = Directory.GetDirectories(Paths.PluginPath, "Tanuki.Atlyss.FontAssetsManager.AssetBundles", SearchOption.AllDirectories);
+        string[] Files;
+
         AssetBundleCreateRequest AssetBundleCreateRequest;
-        foreach (string File in Files)
+        foreach (string Directory in Directories)
         {
-            AssetBundleCreateRequest = AssetBundle.LoadFromFileAsync(File);
-            AssetBundleCreateRequest.completed += OnAssetBundleLoaded;
+            Files = System.IO.Directory.GetFiles(Directory, "*.assetbundle", SearchOption.AllDirectories);
+            foreach (string File in Files)
+            {
+                PendingRefreshes++;
+                AssetBundleCreateRequest = AssetBundle.LoadFromFileAsync(File);
+                AssetBundleCreateRequest.completed += OnAssetBundleLoaded;
+            }
         }
     }
     private void OnAssetBundleLoaded(AsyncOperation AsyncOperation)

@@ -44,9 +44,12 @@ public class Replacements
 
         Rule Rule;
         bool AddReplacement;
+        ushort AssetsFound;
+
         foreach (string File in System.IO.Directory.GetFiles(Directory, "*.json"))
         {
             Configuration = JsonConvert.DeserializeObject<List<Models.Configuration.Replacement>>(System.IO.File.ReadAllText(File));
+            AssetsFound = 0;
 
             foreach (Models.Configuration.Replacement Replacement in Configuration)
             {
@@ -72,6 +75,7 @@ public class Replacements
                 if (TMP_FontAsset is not null)
                 {
                     AddReplacement = true;
+                    AssetsFound++;
 
                     foreach (Replacement<TMP_FontAsset> OtherReplacement in AssetsTMP)
                     {
@@ -93,6 +97,7 @@ public class Replacements
                 if (Font is not null)
                 {
                     AddReplacement = true;
+                    AssetsFound++;
 
                     foreach (Replacement<Font> OtherReplacement in Assets)
                     {
@@ -111,7 +116,19 @@ public class Replacements
                     AssetBundles.Instance.Use(Font);
                 }
             }
+
+            if (AssetsFound > 0)
+                continue;
+
+            RemoveCompletelyUnusedRulesFile(File);
         }
+    }
+    private void RemoveCompletelyUnusedRulesFile(string Path)
+    {
+        if (!Configuration.Instance.General.RemoveCompletelyUnusedRuleFiles.Value)
+            return;
+
+        File.Delete(Path);
     }
     public void Handle(TMP_Text TMP_Text)
     {

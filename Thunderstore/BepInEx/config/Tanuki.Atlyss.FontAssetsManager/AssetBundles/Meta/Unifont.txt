@@ -1,2 +1,0 @@
-Copyright 2025 The GNU Project (https://unifoundry.com/unifont)
-This Font Software is licensed under the GNU General Public License, either Version 2 or a later version, with the exception that embedding the font in a document does not in itself constitute a violation of the GNU GPL.
