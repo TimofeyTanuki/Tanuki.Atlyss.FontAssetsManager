@@ -3,7 +3,7 @@ Plugin for Atlyss that customizes in-game fonts. Use custom fonts, replace exist
 ## Features
 - Replace unknown characters with codes.
 - Add fallback fonts.
-  - Added fallback set of [Noto Sans](https://fonts.google.com/noto) fonts for Cyrillic, Arabic, Japanese, Traditional Chinese and Korean characters.
+  - Added default fallback set of [Noto Sans](https://fonts.google.com/noto) fonts for Cyrillic, Arabic, Japanese, Traditional Chinese and Korean characters.
 - Replace fonts.
 - Configure replacement and fallback rules using regular expressions.
 ### Configuration
@@ -115,7 +115,7 @@ Assets must be of type `Font` (for `Text` objects) or `TMP Font Asset` (for `Tex
 Instructions for creating an asset bundle:
 1. Install [Unity](https://unity.com/releases/editor/archive) (the same version as the game is recommended).
 2. Create an empty project (3D Built-In Render Pipeline).
-3. Import the [example package](../../tree/main/Example).
+3. Import the [example package](https://github.com/TimofeyTanuki/Tanuki.Atlyss.FontAssetsManager/tree/main/Example).
 4. Create a dirrectory for asset bundle files in your project and add a label to it.
 5. Place the file with your font in the directory.
 6. Use the `Unicode List Extractor` tool (`Tools > Fonts`) to create a file with the characters supported by the font.
@@ -133,6 +133,6 @@ It's recommended to use it together with the [EasySettings](https://thunderstore
 ### Manual installation
 1. Install [BepInEx](https://docs.bepinex.dev/articles/user_guide/installation/index.html). It's recommended to use the [preconfigured package](https://thunderstore.io/c/atlyss/p/BepInEx/BepInExPack/).
 2. Install the [Tanuki.Atlyss](https://github.com/TimofeyTanuki/Tanuki.Atlyss) framework.
-3. Install the [Tanuki.Atlyss.FontAssetsManager](../../releases) files.
+3. Install the [Tanuki.Atlyss.FontAssetsManager](https://github.com/TimofeyTanuki/Tanuki.Atlyss.FontAssetsManager/releases) files.
 ## Anything else?
 [Contacts](https://tanu.su/)
