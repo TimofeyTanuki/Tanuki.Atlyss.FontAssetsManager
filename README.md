@@ -61,8 +61,8 @@ Example fallbacks file `100.json`.
   }
 ]
 ```
-It's rules are read from top to bottom and will take precedence over the rules in the `99.json` file, but may be overridden or supplemented by the rules in the `101.json` file.<br>
-The `Rule` property contains regular expressions for `Text` (Unity) or `TMP_Text` (TextMeshPro) object, `Font` is the name of it's current font.<br>
+Its rules are read from top to bottom and will take precedence over the rules in the `99.json` file, but may be overridden or supplemented by the rules in the `101.json` file.<br>
+The `Rule` property contains regular expressions for `Text` (Unity) or `TMP_Text` (TextMeshPro) object, `Font` is the name of its current font.<br>
 The `Fixed` property specifies how the plugin will handle other rules for the same regular expression. If set to `true`, the list of fallback assets will be static, meaning it can't be supplemented with other rules, but it can be overriden.<br>
 The `Assets` property contains a list of fallback assets for the specified regular expression. Each asset refers to a specific asset bundle and the name of the object within it.
 
@@ -125,7 +125,7 @@ Instructions for creating an asset bundle:
 8. Once the asset has been created, delete file with characters.
 9. Export all asset bundles using the `Build` tool (`Tools > AssetBundles`).
 10. After the build, an `Output/AssetBundles` directory will be created with all asset bundles. Select the file corresponding to the label name you specified earlier, add the `.assetbundle` extension to it, then move it to the plugin's asset bundle directory.
-11. Now you can use the label of your asset bundle and the names of it's items in the rules.
+11. Now you can use the label of your asset bundle and the names of its items in the rules.
 ## Getting started
 ### Thunderstore
 This mod on [Thunderstore](https://thunderstore.io/c/atlyss/p/Tanuki/Tanuki_Atlyss_FontAssetsManager/).<br>
