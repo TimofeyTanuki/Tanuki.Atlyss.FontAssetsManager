@@ -38,6 +38,7 @@ internal class Main : Plugin
         if (BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(NessieEasySettings.GUID))
             NessieEasySettings.Initialize();
     }
+
     protected override void Load()
     {
         if (Reloaded)
@@ -63,6 +64,7 @@ internal class Main : Plugin
         Patches.TMPro.TextMeshPro.OnEnable_Prefix.OnInvoke += TextMeshPro_OnEnable_Prefix_OnInvoke;
         UnknownCharactersReplace.Instance.Load();
     }
+
     private void AssetBundles_OnAssetsRefreshed()
     {
         Replacements.Instance.Reload();
@@ -71,10 +73,13 @@ internal class Main : Plugin
         if (Configuration.Instance.General.UnloadUnusedAssets.Value)
             AssetBundles.Instance.DestroyUnusedAssets();
     }
+
     private void TMP_Text_OnEnable_Log(TMP_Text Instance) =>
         Logger.LogDebug(Translate("Debug.TMP_Text.OnEnable", Instance.name, Instance.font.name));
+
     private void Text_OnEnable_Log(Text Instance) =>
         Logger.LogDebug(Translate("Debug.Text.OnEnable", Instance.name, Instance.font.name));
+
     private void Text_OnEnable_Prefix_OnInvoke(Text Instance)
     {
         if (Instance.font is null)
@@ -82,16 +87,19 @@ internal class Main : Plugin
 
         Replacements.Instance.Replace(Instance);
     }
+
     private void TextMeshProUGUI_OnEnable_Prefix_OnInvoke(TextMeshProUGUI Instance)
     {
         Replacements.Instance.Handle(Instance);
         Fallbacks.Instance.Handle(Instance);
     }
+
     private void TextMeshPro_OnEnable_Prefix_OnInvoke(TextMeshPro Instance)
     {
         Replacements.Instance.Handle(Instance);
         Fallbacks.Instance.Handle(Instance);
     }
+
     protected override void Unload()
     {
         Reloaded = true;

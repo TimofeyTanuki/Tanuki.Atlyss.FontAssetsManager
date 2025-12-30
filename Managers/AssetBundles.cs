@@ -9,15 +9,13 @@ namespace Tanuki.Atlyss.FontAssetsManager.Managers;
 
 public class AssetBundles
 {
-    public static AssetBundles Instance;
-
     public delegate void AssetsRefreshed();
     public event AssetsRefreshed OnAssetsRefreshFinished;
 
     public delegate void BeforeAssetsRefresh();
     public event BeforeAssetsRefresh OnBeforeAssetsRefresh;
 
-    private string AssetBundlesPath;
+    public static AssetBundles Instance;
     private readonly Dictionary<ulong, Asset> Assets;
     private readonly Dictionary<Object, ulong> AssetHashes;
     private ushort PendingRefreshes = 0;
@@ -31,6 +29,7 @@ public class AssetBundles
     }
 
     public static void Initialize() => Instance ??= new();
+
     internal void Refresh()
     {
         if (Assets.Count > 0)
@@ -54,6 +53,7 @@ public class AssetBundles
             }
         }
     }
+
     private void OnAssetBundleLoaded(AsyncOperation AsyncOperation)
     {
         AssetBundleCreateRequest AssetBundleCreateRequest = AsyncOperation as AssetBundleCreateRequest;
@@ -96,8 +96,10 @@ public class AssetBundles
         AssetBundleUnloadOperation AssetBundleUnloadOperation = AssetBundle.UnloadAsync(false);
         AssetBundleUnloadOperation.completed += OnAssetBundleUnloaded;
     }
+
     private void OnAssetBundleUnloaded(AsyncOperation AsyncOperation) =>
         OnAssetBundleProcessFinished();
+
     private void OnAssetBundleProcessFinished()
     {
         PendingRefreshes--;
@@ -107,8 +109,10 @@ public class AssetBundles
 
         OnAssetsRefreshFinished?.Invoke();
     }
+
     private ulong GetAssetHash(string AssetBundle, string AssetName) =>
         ((ulong)AssetBundle.GetHashCode() << 32) | (uint)AssetName.GetHashCode();
+
     public T GetAssetObject<T>(string AssetBundle, string AssetName) where T : class
     {
         Assets.TryGetValue(GetAssetHash(AssetBundle, AssetName), out Asset Asset);
@@ -121,6 +125,7 @@ public class AssetBundles
 
         return Asset.Object as T;
     }
+
     public void Use(Object Object)
     {
         if (!AssetHashes.TryGetValue(Object, out ulong Hash))
@@ -128,6 +133,7 @@ public class AssetBundles
 
         Assets[Hash].Uses++;
     }
+
     public void Unuse(Object Object, bool PreventUnload)
     {
         if (!AssetHashes.TryGetValue(Object, out ulong Hash))
@@ -145,6 +151,7 @@ public class AssetBundles
         AssetHashes.Remove(Object);
         Object.Destroy(Object);
     }
+
     public void DestroyUnusedAssets()
     {
         List<ulong> Unused = [];
