@@ -1,11 +1,11 @@
 {
   "name": "Tanuki_Atlyss_FontAssetsManager",
-  "version_number": "1.0.3",
+  "version_number": "1.0.4",
   "website_url": "https://github.com/TimofeyTanuki/Tanuki.Atlyss.FontAssetsManager",
-  "description": "Plugin for Atlyss that customizes in-game fonts. Use custom fonts, replace existing ones, add fallbacks, and prevent missing characters from being displayed.",
+  "description": "Plugin for Atlyss that customizes fonts and fixes missing Unicode characters. Use custom fonts, replace existing ones, add fallbacks, and prevent missing characters from being displayed.",
   "dependencies":
   [
     "BepInEx-BepInExPack-5.4.2304",
-    "Tanuki-Tanuki_Atlyss-2.2.4"
+    "Tanuki-Tanuki_Atlyss-2.3.1"
   ]
 }
