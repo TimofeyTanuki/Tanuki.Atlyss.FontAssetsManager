@@ -1,5 +1,5 @@
 # Tanuki.Atlyss.FontAssetsManager
-Plugin for Atlyss that customizes in-game fonts. Use custom fonts, replace existing ones, add fallbacks, and prevent missing characters from being displayed.<br>
+Plugin for Atlyss that customizes fonts and fixes missing Unicode characters. Use custom fonts, replace existing ones, add fallbacks, and prevent missing characters from being displayed.<br>
 ## Features
 - Replace unknown characters with codes.
 - Add fallback fonts.
